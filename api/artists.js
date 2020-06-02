@@ -36,7 +36,6 @@ artistsRouter.get('/:artistId', (req, res, next) => {
 artistsRouter.post('/', (req, res, next) => {
   const artist = req.body.artist
   const valid = artist.name && artist.dateOfBirth && artist.biography
-  console.log(artist.name, artist.dateOfBirth, artist.biography)
   if (valid) {
     if (!artist.is_currently_employed) {
       artist.is_currently_employed = 1
@@ -65,6 +64,38 @@ artistsRouter.post('/', (req, res, next) => {
             next(error)
           } else if (row) {
             res.status(201).json({ artist: row })
+          }
+        })
+      }
+    })
+  } else {
+    res.sendStatus(400)
+  }
+})
+
+artistsRouter.put('/:artistId', (req, res, next) => {
+  const artist = req.body.artist
+  const valid = artist.name && artist.dateOfBirth && artist.biography
+  if (valid) {
+    if (!artist.is_currently_employed) {
+      artist.is_currently_employed = 1
+    }
+    db.run(`
+      UPDATE Artist
+      SET name = "${artist.name}",
+          date_of_birth = "${artist.dateOfBirth}",
+          biography = "${artist.biography}",
+          is_currently_employed = ${artist.is_currently_employed}
+      WHERE id = ${req.artistId}
+    `, (error) => {
+      if (error) {
+        next(error)
+      } else {
+        db.get('SELECT * FROM Artist WHERE id = $id', { $id: req.artistId }, (error, row) => {
+          if (error) {
+            next(error)
+          } else {
+            res.status(200).send({ artist: row })
           }
         })
       }
