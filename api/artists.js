@@ -2,7 +2,7 @@ const express = require('express')
 const artistsRouter = express.Router()
 
 const sqlite = require('sqlite3')
-const dbPath = process.env.TEST_DATABASE || '../database.qlite'
+const dbPath = process.env.TEST_DATABASE || './database.sqlite'
 const db = new sqlite.Database(dbPath)
 
 artistsRouter.get('/', (req, res, next) => {

@@ -1,6 +1,6 @@
 const express = require('express')
 const app = express()
-const port = process.env.PORT || 8081
+const port = process.env.PORT || 4000
 
 const bodyParser = require('body-parser')
 app.use(bodyParser.json())
@@ -16,5 +16,7 @@ app.use(morgan('dev'))
 
 const apiRouter = require('./api/api')
 app.use('/api', apiRouter)
+
+app.listen(port)
 
 module.exports = app
