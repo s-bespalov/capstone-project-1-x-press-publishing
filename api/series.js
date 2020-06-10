@@ -1,5 +1,6 @@
 const express = require('express')
 const seriesRouter = express.Router()
+const issuesRouter = require('./issues')
 
 const sqlite = require('sqlite3')
 const dbPath = process.env.TEST_DATABASE || './database.sqlite'
@@ -97,5 +98,7 @@ seriesRouter.put('/:seriesId', (req, res, next) => {
     }
   )
 })
+
+seriesRouter.use('/:seriesId/issues', issuesRouter)
 
 module.exports = seriesRouter
