@@ -66,6 +66,9 @@ issuesRouter.param('issueId', (req, res, next, issueId) => {
       if (error) {
         return res.sendStatus(404)
       }
+      if (!row) {
+        return res.sendStatus(404)
+      }
       req.issue = row
       next()
     }

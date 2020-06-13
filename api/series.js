@@ -99,6 +99,27 @@ seriesRouter.put('/:seriesId', (req, res, next) => {
   )
 })
 
+seriesRouter.delete('/:seriesId', (req, res, next) => {
+  db.all(
+    'SELECT * FROM Issue WHERE series_id = $id',
+    { $id: req.series.id },
+    (error, rows) => {
+      if (error) {
+        return next(error)
+      }
+      if (rows && rows.length > 0) {
+        return res.sendStatus(400)
+      }
+      db.run('DELETE FROM Series WHERE id = $id', { $id: req.series.id }, (error) => {
+        if (error) {
+          return next(error)
+        }
+        res.sendStatus(204)
+      })
+    }
+  )
+})
+
 seriesRouter.use('/:seriesId/issues', issuesRouter)
 
 module.exports = seriesRouter
