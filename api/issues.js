@@ -42,7 +42,7 @@ issuesRouter.post('/', (req, res, next) => {
           "${issue.name}", ${issue.issueNumber}, "${issue.publicationDate}", ${issue.artistId}, ${req.series.id}
         )
       `,
-      function(error) {
+      function (error) {
         if (error) {
           return next(error)
         }
@@ -56,6 +56,58 @@ issuesRouter.post('/', (req, res, next) => {
       )
     }
   )
+})
+
+issuesRouter.param('issueId', (req, res, next, issueId) => {
+  db.get(
+    'SELECT * FROM Issue WHERE id = $id',
+    { $id: issueId },
+    (error, row) => {
+      if (error) {
+        return res.sendStatus(404)
+      }
+      req.issue = row
+      next()
+    }
+  )
+})
+
+issuesRouter.put('/:issueId', (req, res, next) => {
+  const issue = req.body.issue
+  const valid = issue.name && issue.publicationDate && issue.issueNumber && issue.artistId
+  if (!valid) {
+    return res.sendStatus(400)
+  }
+  db.run(
+    `
+    UPDATE Issue
+    SET name = "${issue.name}",
+        issue_number = ${issue.issueNumber},
+        publication_date = "${issue.publicationDate}",
+        artist_id = ${issue.artistId}
+    WHERE id = ${req.issue.id}
+    `,
+    (error) => {
+      if (error) {
+        return next(error)
+      }
+      db.get('SELECT * FROM Issue WHERE id = $id', { $id: req.issue.id }, (error, row) => {
+        if (error) {
+          return next(error)
+        }
+        res.status(200).json({ issue: row })
+      })
+    }
+  )
+})
+
+issuesRouter.delete('/:issueId', (req, res, next) => {
+  db.run('DELETE FROM Issue WHERE id = $id', { $id: req.issue.id }, (error) => {
+    if (error) {
+      return next(error)
+    }
+    res.sendStatus(204)
+  })
 })
 
 module.exports = issuesRouter

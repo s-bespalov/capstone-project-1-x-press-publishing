@@ -17,6 +17,8 @@ app.use(morgan('dev'))
 const apiRouter = require('./api/api')
 app.use('/api', apiRouter)
 
+app.disable('etag')
+
 app.listen(port)
 
 module.exports = app
